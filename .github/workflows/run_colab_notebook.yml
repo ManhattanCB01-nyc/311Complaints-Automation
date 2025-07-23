@@ -36,10 +36,3 @@ jobs:
           # --inplace: overwrite the original notebook with the executed version
           # --output: specify output path (optional, if not using --inplace)
           jupyter nbconvert --to notebook --execute --inplace gg_sheet.ipynb
-
-      - name: Commit executed notebook (Optional: for debugging/history)
-        uses: stefanzweifel/git-auto-commit-action@v5
-        with:
-          commit_message: "Automated: Executed Colab notebook via GitHub Actions"
-          branch: main # Or your default branch if different
-          file_pattern: 'gg_sheet.ipynb' # Only commit the notebook file
