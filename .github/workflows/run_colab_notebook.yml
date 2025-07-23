@@ -1,14 +1,15 @@
-name: Run Colab Notebook Daily
+name: Run Colab Notebook Daily (via nbconvert)
 
 on:
   workflow_dispatch: # Allows manual trigger from GitHub UI
-  repository_dispatch: # Allows triggering from external services like Make.com
-    types: [run_colab_update] # Custom event type that Make.com will send
+  schedule:
+    # Runs every day at 03:00 AM UTC (Coordinated Universal Time)
+    # Adjust the '0 3' to your desired hour (0-23) and minute (0-59) in UTC.
+    - cron: '0 3 * * *'
 
 jobs:
-  run-notebook:
+  run-notebook-via-nbconvert: # Job name changed for clarity
     runs-on: ubuntu-latest
-    # Add a timeout for the entire job to prevent indefinite runs
     timeout-minutes: 60 # Set a reasonable timeout, e.g., 60 minutes
 
     steps:
@@ -22,13 +23,23 @@ jobs:
 
       - name: Install dependencies
         run: |
-          pip install pandas requests google-auth google-api-python-client urllib3 openpyxl google-colab
+          # Install necessary libraries for your script
+          pip install pandas requests google-auth google-api-python-client urllib3 openpyxl
+          # Install nbconvert and jupyter (required for nbconvert execution)
+          pip install nbconvert jupyter
 
-      - name: Run Colab Notebook
-        # Ensure the action name and version are exactly correct
-        uses: colab-actions/run-notebook@v1 
+      - name: Run Colab Notebook (using nbconvert)
+        run: |
+          # Execute the notebook using nbconvert
+          # --to notebook: output format is a notebook (executed version)
+          # --execute: execute all cells
+          # --inplace: overwrite the original notebook with the executed version
+          # --output: specify output path (optional, if not using --inplace)
+          jupyter nbconvert --to notebook --execute --inplace gg_sheet.ipynb
+
+      - name: Commit executed notebook (Optional: for debugging/history)
+        uses: stefanzweifel/git-auto-commit-action@v5
         with:
-          notebook: 'gg_sheet.ipynb'
-          github_token: ${{ secrets.GITHUB_TOKEN }}
-          # Ensure SERVICE_ACCOUNT_KEY_FILE path in your Colab notebook is correct
-          # for the mounted Drive in Colab (e.g., /content/drive/MyDrive/...)
+          commit_message: "Automated: Executed Colab notebook via GitHub Actions"
+          branch: main # Or your default branch if different
+          file_pattern: 'gg_sheet.ipynb' # Only commit the notebook file
