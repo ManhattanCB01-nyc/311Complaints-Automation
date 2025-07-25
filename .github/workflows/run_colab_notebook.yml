@@ -1,38 +1,40 @@
 name: Run Colab Notebook Daily (via nbconvert)
 
 on:
-  workflow_dispatch: # Allows manual trigger from GitHub UI
+  workflow_dispatch:
   schedule:
-    # Runs every day at 03:00 AM UTC (Coordinated Universal Time)
-    # Adjust the '0 3' to your desired hour (0-23) and minute (0-59) in UTC.
     - cron: '0 3 * * *'
 
 jobs:
-  run-notebook-via-nbconvert: # Job name changed for clarity
+  run-notebook-via-nbconvert:
     runs-on: ubuntu-latest
-    timeout-minutes: 60 # Set a reasonable timeout, e.g., 60 minutes
+    timeout-minutes: 60
 
     steps:
       - name: Checkout repository
         uses: actions/checkout@v4
 
+      - name: Create Service Account Key File
+        run: |
+          echo "${{ secrets.SERVICE_ACCOUNT_JSON_KEY }}" > service_account_key.json
+        # This step creates the file in the runner's workspace from the secret
+
       - name: Set up Python
         uses: actions/setup-python@v5
         with:
-          python-version: '3.10' # Recommended stable Python 3 version
+          python-version: '3.10'
 
       - name: Install dependencies
         run: |
-          # Install necessary libraries for your script
-          pip install pandas requests google-auth google-api-python-client urllib3 openpyxl
-          # Install nbconvert and jupyter (required for nbconvert execution)
-          pip install nbconvert jupyter
+          pip install pandas requests google-auth google-api-python-client urllib3 openpyxl nbconvert jupyter
 
       - name: Run Colab Notebook (using nbconvert)
         run: |
-          # Execute the notebook using nbconvert
-          # --to notebook: output format is a notebook (executed version)
-          # --execute: execute all cells
-          # --inplace: overwrite the original notebook with the executed version
-          # --output: specify output path (optional, if not using --inplace)
           jupyter nbconvert --to notebook --execute --inplace gg_sheet.ipynb
+
+      - name: Commit executed notebook (Optional: for debugging/history)
+        uses: stefanzweifel/git-auto-commit-action@v5
+        with:
+          commit_message: "Automated: Executed Colab notebook via GitHub Actions"
+          branch: main
+          file_pattern: 'gg_sheet.ipynb'
