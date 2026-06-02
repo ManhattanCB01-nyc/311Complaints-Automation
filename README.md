@@ -9,10 +9,8 @@ it does the action daily.
 
 **ggplot also does a lot of wok:**
 
-It prevents downloading years of duplicate data (Incremental Loading): The NYC 311 database is massive. If the script didn't know when it last ran, it would have to download all the data from July 2018 up to today every single time it executes. By reading that file, it says, "Oh, I successfully ran yesterday. I only need to grab the last 24 hours of complaints."
+It prevents downloading years of duplicate data (Incremental Loading): The NYC 311 database is massive. If the script didn't know when it last ran, it would have to download all the data from July 2018 up to today every single time it executes.
 
 It keeps you from getting blocked by the API: The NYC Open Data API (like almost all web APIs) has rate limits. If you ask it to send you millions of historical rows every single day, it will quickly throttle your connection or block you entirely for stressing their servers.
-
-It saves massive amounts of time and memory: Pandas (the library doing the data cleaning) processes data in your computer's RAM. Downloading, cleaning, and uploading a few hundred new rows takes seconds. Doing that for hundreds of thousands of rows takes significantly longer and could easily crash the environment running the script.
 
 It acts as a fail-safe for crashes: If the script breaks halfway through—maybe the internet drops, or the NYC API goes down—the progress file won't get updated. The next time the script runs, it will look at the old date and simply try again, ensuring no data falls through the cracks.
