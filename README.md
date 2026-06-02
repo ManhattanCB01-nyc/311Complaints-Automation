@@ -14,3 +14,5 @@ It prevents downloading years of duplicate data (Incremental Loading): The NYC 3
 It keeps you from getting blocked by the API: The NYC Open Data API (like almost all web APIs) has rate limits. If you ask it to send you millions of historical rows every single day, it will quickly throttle your connection or block you entirely for stressing their servers.
 
 It acts as a fail-safe for crashes: If the script breaks halfway through—maybe the internet drops, or the NYC API goes down—the progress file won't get updated. The next time the script runs, it will look at the old date and simply try again, ensuring no data falls through the cracks.
+
+https://docs.google.com/document/d/1Wa3yDEzPTYL7h6_ud-4zonodCdTlbsjVRTHesn76Jgo/edit?tab=t.z2ietjdgogdk - check the link for more detail process
